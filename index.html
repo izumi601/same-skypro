@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>同じ空の下</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Hiragino Sans', 'ヒラギノ角ゴシック', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'Meiryo', sans-serif;
+      overflow: hidden;
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      transition: background 3s ease;
+      /* デフォルトの背景色（深夜） */
+      background: linear-gradient(to bottom, #2d1b69, #1e3a8a, #1e40af);
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      filter: blur(30px);
+      animation: float 40s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(20px) translateY(-10px); }
+      50% { transform: translateX(0) translateY(-20px); }
+      75% { transform: translateX(-20px) translateY(-10px); }
+    }
+
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .user-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      color: white;
+      font-size: 16px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.5s ease;
+    }
+
+    .count-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #a5b4fc;
+    }
+
+    .footer-message {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      line-height: 1.8;
+      z-index: 10;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .button {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+    }
+
+    .button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(30, 27, 75, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      color: white;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #a5b4fc;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .modal-button {
+      padding: 12px 32px;
+      background: rgba(165, 180, 252, 0.2);
+      border: 1px solid rgba(165, 180, 252, 0.5);
+      border-radius: 30px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-button:hover {
+      background: rgba(165, 180, 252, 0.3);
+      transform: scale(1.05);
+    }
+
+    .modal-button.primary {
+      background: rgba(165, 180, 252, 0.5);
+      border-color: #a5b4fc;
+    }
+
+    #info-modal .modal-content {
+      text-align: left;
+      max-width: 600px;
+    }
+
+    #info-modal h3 {
+      font-size: 18px;
+      color: #a5b4fc;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    #info-modal ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #info-modal li {
+      padding: 8px 0;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .close-button {
+      margin-top: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgm" loop muted autoplay>
+    <source src="./bgm.mp3" type="audio/mpeg"> 
+ </audio>
+
+  <div class="content">
+    <div class="user-count">
+      <span>今、</span>
+      <span class="count-number" id="count">0</span>
+      <span>人が同じ空を見ています</span>
+    </div>
+  </div>
+
+  <div class="footer-message">
+    ここは誰とも話す必要がない、<br>
+    ただ一緒にいることを感じられる場所です
+  </div>
+
+  <div class="controls">
+    <button id="music-toggle" class="button" title="音楽">🔇</button>
+    <button id="info-button" class="button" title="このアプリについて">ℹ️</button>
+  </div>
+
+  <div id="welcome-modal" class="modal active">
+    <div class="modal-content">
+      <h2>音楽を流しますか？</h2>
+      <p>静かなピアノの音楽が、<br>あなたの時間に寄り添います。</p>
+      <div class="modal-buttons">
+        <button id="music-yes" class="modal-button primary">はい</button>
+        <button id="music-no" class="modal-button">いいえ</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <h2>このアプリについて</h2>
+      <p>ここは、誰とも話す必要がない場所です。</p>
+      <p>夜中に眠れないとき、不安に押しつぶされそうなとき、<br>
+      ただ「誰かがいる」ことを感じられる場所。</p>
+      <p>投稿も、いいねも、通知もありません。<br>
+      ただ、この同じ空のしたに、あなたと同じように<br>
+      何かと向き合っている人がいます。</p>
+      <p style="font-weight: bold; color: #a5b4fc;">一人じゃないよ。</p>
+
+      <h3>こんな人に</h3>
+      <ul>
+        <li>・眠れない夜、誰かの存在を感じたい人</li>
+        <li>・妊娠中や子育て中で、深夜に孤独を感じる人</li>
+        <li>・不安やパニックで苦しんでいる人</li>
+        <li>・今この瞬間に同じ空のしたで誰かも同じように頑張ってます、深呼吸をして風にあたってみましょう。大丈夫、あなたは十分頑張っていますよ</li>
+      </ul>
+
+      <button id="close-info" class="modal-button close-button">閉じる</button>
+    </div>
+  </div>
+
+  <script>
+    console.log('Script loaded');
+
+    function updateSkyColor() {
+      const hour = new Date().getHours();
+      const body = document.body;
+      
+      console.log('Current hour:', hour);
+      
+      if (hour >= 4 && hour < 6) {
+        body.style.background = 'linear-gradient(to bottom, #4c1d95, #f472b6, #fb923c)';
+      } else if (hour >= 6 && hour < 10) {
+        body.style.background = 'linear-gradient(to bottom, #60a5fa, #93c5fd, #dbeafe)';
+      } else if (hour >= 10 && hour < 16) {
+        body.style.background = 'linear-gradient(to bottom, #3b82f6, #60a5fa, #bfdbfe)';
+      } else if (hour >= 16 && hour < 18) {
+        body.style.background = 'linear-gradient(to bottom, #fb923c, #f97316, #c026d3)';
+      } else if (hour >= 18 && hour < 22) {
+        body.style.background = 'linear-gradient(to bottom, #1e3a8a, #312e81, #4c1d95)';
+      } else {
+        body.style.background = 'linear-gradient(to bottom, #2d1b69, #1e3a8a, #1e40af)';
+      }
+    }
+
+    function createStars() {
+      console.log('Creating stars...');
+      for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.animationDuration = (2 + Math.random() * 2) + 's';
+        document.body.appendChild(star);
+      }
+      console.log('Stars created');
+    }
+
+    function createClouds() {
+      console.log('Creating clouds...');
+      for (let i = 0; i < 6; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        cloud.style.left = Math.random() * 100 + '%';
+        cloud.style.top = Math.random() * 80 + '%';
+        cloud.style.width = (100 + Math.random() * 150) + 'px';
+        cloud.style.height = (50 + Math.random() * 80) + 'px';
+        cloud.style.animationDelay = Math.random() * 10 + 's';
+        cloud.style.animationDuration = (30 + Math.random() * 20) + 's';
+        document.body.appendChild(cloud);
+      }
+      console.log('Clouds created');
+    }
+
+    function updateUserCount() {
+      const count = Math.floor(Math.random() * 15) + 3;
+      const countElement = document.getElementById('count');
+      
+      if (countElement) {
+        countElement.style.transform = 'scale(1.3)';
+        countElement.style.color = '#fbbf24';
+        
+        setTimeout(() => {
+          countElement.textContent = count;
+          setTimeout(() => {
+            countElement.style.transform = 'scale(1)';
+            countElement.style.color = '#a5b4fc';
+          }, 200);
+        }, 200);
+      }
+    }
+
+    // 音楽の制御
+    const bgm = document.getElementById('bgm');
+    const musicToggle = document.getElementById('music-toggle');
+    const welcomeModal = document.getElementById('welcome-modal');
+    const musicYes = document.getElementById('music-yes');
+    const musicNo = document.getElementById('music-no');
+    
+    // isPlayingの状態をbgm.mutedプロパティで管理する
+    
+    if (bgm) {
+      bgm.volume = 0.3;
+      // 初期アイコン設定 (autoplay mutedなので最初は🔇)
+      if (musicToggle) musicToggle.textContent = '🔇';
+    }
+
+
+    if (musicYes) {
+      musicYes.addEventListener('click', () => {
+        if (bgm) {
+          bgm.muted = false; // ★ ミュート解除
+          // autoplay属性が付いているため、play()は念のため実行
+          bgm.play().catch(e => console.log('Audio play failed:', e)); 
+          if (musicToggle) musicToggle.textContent = '🔊';
+        }
+        if (welcomeModal) welcomeModal.classList.remove('active');
+      });
+    }
+
+    if (musicNo) {
+      musicNo.addEventListener('click', () => {
+        if (welcomeModal) welcomeModal.classList.remove('active');
+      });
+    }
+
+    // ★★★ musicToggleのロジックを修正: ポップアップを削除し、ミュート機能のみに集中 ★★★
+    if (musicToggle) {
+      musicToggle.addEventListener('click', () => {
+        
+        // bgm要素がない場合は、処理を中断
+        if (!bgm) return;
+        
+        // ミュート状態を切り替える
+        if (bgm.muted) {
+          // 🔇 → 🔊 に切り替え (ミュート解除)
+          bgm.muted = false; 
+          musicToggle.textContent = '🔊';
+          
+          // 再生が止まっている場合、再生を再開する (ブラウザブロック対策)
+          if (bgm.paused) {
+              bgm.play().catch(e => console.log('Audio play failed on toggle:', e));
+          }
+        } else {
+          // 🔊 → 🔇 に切り替え (ミュート)
+          bgm.muted = true; 
+          musicToggle.textContent = '🔇';
+        }
+      });
+    }
+
+    // 情報モーダル
+    const infoButton = document.getElementById('info-button');
+    const infoModal = document.getElementById('info-modal');
+    const closeInfo = document.getElementById('close-info');
+
+    if (infoButton && infoModal) {
+      infoButton.addEventListener('click', () => {
+        infoModal.classList.add('active');
+      });
+    }
+
+    if (closeInfo && infoModal) {
+      closeInfo.addEventListener('click', () => {
+        infoModal.classList.remove('active');
+      });
+    }
+
+    // 初期化
+    console.log('Initializing...');
+    updateSkyColor();
+    createStars();
+    createClouds();
+    updateUserCount();
+
+    // 定期更新
+    setInterval(updateSkyColor, 60000);
+    setInterval(updateUserCount, 45000);
+    
+    console.log('Initialization complete');
+  </script>
+</body>
+</html>
