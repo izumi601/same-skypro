@@ -5,7 +5,7 @@
 
 <img width="1643" height="882" alt="スクリーンショット 2025-11-26 0 24 48" src="https://github.com/user-attachments/assets/2d161dd0-edab-45b8-b587-5a413bc336ee" />
 
-<img width="766" height="839" alt="スクリーンショット 2025-11-26 0 25 46" src="https://github.com/user-attachments/assets/1e83ec7f-59e3-4711-98b5-19baf4fce70c" />
+<img width="765" height="817" alt="スクリーンショット 2025-11-26 2 19 03" src="https://github.com/user-attachments/assets/5bf49ae0-44af-4696-96d9-b9ba6f15aa2c" />
 
 ---
 
